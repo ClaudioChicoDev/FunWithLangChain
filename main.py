@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+
+
 
 
 # Load environment variables from .env file
@@ -24,18 +27,8 @@ What is a good name for a company that makes {product}?
 """,
 )
 
-while True:
-    # Get input from user
-    user_input = input("\nWhat product does your company make? (Type 'exit' to quit): ")
+# Test Chains
+chain = LLMChain(llm=llm, prompt=prompt)
+response = chain.run("cheese that smells kind of bad but tastes good")
 
-    # Exit if user types 'exit'
-    if user_input.lower().strip() == "exit":
-        break
-
-    # Generate company name
-    company_name = llm(prompt.format(product=user_input))
-
-    # Print company name
-    print(f"Company name: {company_name}\n")
-
-print("\nGoodbye!")
+print(response)
