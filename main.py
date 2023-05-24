@@ -1,25 +1,27 @@
 import os
 from dotenv import load_dotenv
-from langchain.agents import load_tools
-from langchain.agents import initialize_agent
-from langchain.agents import AgentType
-from langchain.llms import OpenAI
+
 
 # Load environment variables from .env file
 load_dotenv('.env')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-# Initialize OpenAI API
-llm = OpenAI(openai_api_key="OPENAI_API_KEY")
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
 
-# Setup llm parameters
-llm = OpenAI(temperature=0.1)
+chat = ChatOpenAI(temperature=0)
 
-# Load some tools
-tools = load_tools(["wikipedia", "llm-math"], llm=llm)
+template = "You are a helpful assistant that translates {input_language} to {output_language}."
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+human_template = "{text}"
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
 
-# Initialize agent with the tools
-agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
-# Now let's test it out!
-agent.run("what is 469219 Kamoʻoalewa? How big is it and what is it made of?")
+# get a chat completion from the formatted messages
+result = chat(chat_prompt.format_prompt(input_language="English", output_language="French", text="I love programming.").to_messages())
+print(result.content)
